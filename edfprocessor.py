@@ -423,8 +423,15 @@ def write_fixation_data_to_csv(asc_name, csv_name, trial_marker_start='TRIALID',
     """
     if asc_name.endswith('.asc') and os.path.exists(asc_name):
 
-        allTrialsFixationData, allTrialsIAREA, displaycoords = process_edf(asc_name, trial_marker_start,
-                                                                           trial_marker_end)
+        # Check if the result is an instance of EyeData and extract attributes
+        if isinstance(result, EyeData):
+            allTrialsFixationData = result.allTrialsFixationData
+            allTrialsIAREA = result.allTrialsIAREA
+            displaycoords = result.displaycoords
+        else:
+            # Fallback for older behavior of process_edf
+            allTrialsFixationData, allTrialsIAREA, displaycoords = result
+
         trialStartTimes, trialEndTimes = get_trial_times(asc_name, trial_marker_start, trial_marker_end)
 
         allTrialsFixationData.to_csv(csv_name[:-4] + '_all_fixations.csv')
